@@ -10,19 +10,19 @@ timestamp_file = 'last_modified.json'
 
 dbx = dropbox.Dropbox(ACCESS_TOKEN)
 
-# קבלת זמן השינוי מהקובץ ב-Dropbox
+# Get the last modified time of the file in Dropbox
 metadata = dbx.files_get_metadata(dropbox_path)
 current_modified = metadata.client_modified.isoformat()
 print("📅 Last modified:", current_modified)
 
-# בדיקה אם יש קובץ עם זמן קודם
+# Check if there's a saved timestamp from a previous download
 last_modified = None
 if os.path.exists(timestamp_file):
     with open(timestamp_file, 'r') as f:
         data = json.load(f)
         last_modified = data.get('modified')
 
-# השוואה וזיהוי שינוי
+# Compare and detect changes
 if last_modified == current_modified:
     print("⚠️ No changes detected, skipping download.")
 else:
@@ -32,6 +32,6 @@ else:
         f.write(res.content)
     print("✅ File downloaded successfully!")
 
-    # עדכון קובץ הזמן
+    # Save the current timestamp for future comparison
     with open(timestamp_file, 'w') as f:
         json.dump({'modified': current_modified}, f)
